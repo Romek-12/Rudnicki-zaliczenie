@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="text-malinowy fw-bold mb-4">Moje Konto</h1>
+        <p class="lead">Witaj, <strong>{{ current_user.username }}</strong>!</p>
+        <p class="text-muted">Email: {{ current_user.email }}</p>
+    </div>
+</div>
+
+<hr class="my-4">
+
+<!-- SEKCJA: HISTORIA ZAKUPÓW -->
+<div class="row mb-5">
+    <div class="col-12">
+        <h3 class="text-buraczkowy fw-bold mb-3">🛒 Historia Zakupów</h3>
+        {% if orders %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Produkty</th>
+                        <th>Suma</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.produkty | join(', ') }}</td>
+                        <td class="text-success fw-bold">{{ order.suma }} zł</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-light">Nie masz jeszcze żadnych zamówień.</div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- SEKCJA: WIZYTY -->
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-lososiowy">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 text-lososiowy">📅 Zaplanowane Wizyty</h5>
+            </div>
+            <div class="card-body">
+                {% set upcoming = current_user.visits | selectattr('status', 'equalto', 'zaplanowana') | list %}
+                {% if upcoming %}
+                <ul class="list-group list-group-flush">
+                    {% for v in upcoming %}
+                    <li class="list-group-item">{{ v.date }} o {{ v.time }}</li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted small mb-0">Brak zaplanowanych wizyt.</p>
+                {% endif %}
+                <a href="{{ url_for('visit') }}" class="btn btn-outline-lososiowy btn-sm mt-3">Umów nową wizytę</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-secondary">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 text-secondary">📋 Minione Wizyty</h5>
+            </div>
+            <div class="card-body">
+                {% set past = current_user.visits | selectattr('status', 'equalto', 'odbyta') | list %}
+                {% if past %}
+                <ul class="list-group list-group-flush">
+                    {% for v in past %}
+                    <li class="list-group-item">{{ v.date }} o {{ v.time }}</li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted small mb-0">Historia wizyt pojawi się tutaj.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

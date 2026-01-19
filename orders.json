@@ -1,0 +1,11 @@
+[
+    {
+        "uzytkownik": "test",
+        "produkty": [
+            "E-Book: Zerwij z cukrem",
+            "E-Book: 12 afirmacji",
+            "Jad\u0142ospis 1200 kcal - Thermomix"
+        ],
+        "suma": 60.0
+    }
+]

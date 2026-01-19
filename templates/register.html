@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card shadow border-malinowy">
+            <div class="card-body p-5">
+                <h2 class="text-center text-malinowy fw-bold mb-4">Rejestracja</h2>
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Nazwa użytkownika</label>
+                        <input type="text" name="username" class="form-control" required placeholder="Wpisz swój login">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Adres email</label>
+                        <input type="email" name="email" class="form-control" required placeholder="twoj@email.pl">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Hasło</label>
+                        <input type="password" name="password" class="form-control" required
+                            placeholder="Wybierz silne hasło">
+                    </div>
+                    <button type="submit" class="btn btn-malinowy w-100">Utwórz konto</button>
+                </form>
+                <p class="text-center mt-3">Masz już konto? <a href="{{ url_for('login') }}"
+                        class="text-malinowy">Zaloguj się</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

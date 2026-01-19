@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="text-malinowy fw-bold mb-4">📅 Umów Wizytę</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-lososiowy mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Wybierz datę</h5>
+            </div>
+            <div class="card-body">
+                <form method="GET" action="{{ url_for('visit') }}">
+                    <input type="date" name="date" class="form-control mb-3" 
+                           value="{{ selected_date }}" min="{{ selected_date }}">
+                    <button type="submit" class="btn btn-lososiowy">Pokaż dostępne godziny</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Godziny pracy</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-1"><strong>Pon-Pt:</strong> 10:00-14:00, 16:00-19:00</p>
+                <p class="mb-1"><strong>Sobota:</strong> 11:00-13:00</p>
+                <p class="mb-0 text-muted"><strong>Niedziela:</strong> Zamknięte</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <!-- KROK 2: Wybierz godzinę -->
+        {% if not selected_time %}
+        <div class="card shadow border-malinowy mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 text-malinowy">Wybierz godzinę ({{ selected_date }})</h5>
+            </div>
+            <div class="card-body">
+                {% if available_slots %}
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for slot in available_slots %}
+                        <a href="{{ url_for('visit', date=selected_date, time=slot) }}" 
+                           class="btn btn-outline-malinowy">
+                            {{ slot }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">Brak wolnych terminów w tym dniu. Wybierz inną datę.</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- KROK 3: Potwierdzenie -->
+        {% if selected_time %}
+        <div class="card shadow border-success">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Potwierdź rezerwację</h5>
+            </div>
+            <div class="card-body text-center">
+                <p class="lead mb-1">Wybrany termin:</p>
+                <h3 class="text-malinowy fw-bold">{{ selected_date }}</h3>
+                <h2 class="text-buraczkowy fw-bold mb-4">godz. {{ selected_time }}</h2>
+                
+                <form method="POST" action="{{ url_for('book_visit') }}">
+                    <input type="hidden" name="date" value="{{ selected_date }}">
+                    <input type="hidden" name="time" value="{{ selected_time }}">
+                    <button type="submit" class="btn btn-success btn-lg w-100 mb-2">
+                        ✓ Potwierdź wizytę
+                    </button>
+                </form>
+                <a href="{{ url_for('visit', date=selected_date) }}" class="btn btn-outline-secondary btn-sm">
+                    ← Wybierz inną godzinę
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

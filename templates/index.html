@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- SEKKCJA O MNIE -->
+<div class="row hero-section align-items-center">
+    <div class="col-md-5 text-center">
+        <!-- Miejsce na zdjęcie -->
+        <img src="\static\images\o_mnie.jpg" alt="Zdjęcie Oli" class="profile-img mb-10"
+            style="width: 80%; height: auto; aspect-ratio: 5/7;">
+
+    </div>
+    <div class="col-md-7">
+        <h1 class="display-4 fw-bold text-malinowy">Cześć, jestem Ola!</h1>
+        <p class="lead">Jestem dyplomowanym psychodietetykiem. Pomagam naprawić relację z jedzeniem bez restrykcyjnych
+            diet.</p>
+        <p>Wierzę, że zdrowy styl życia zaczyna się w głowie. Zapraszam Cię do mojego świata, gdzie jedzenie jest
+            przyjemnością, a nie wrogiem.</p>
+        <a href="{{ url_for('about') }}" class="btn btn-outline-malinowy mt-2">Czytaj więcej o mnie &rarr;</a>
+    </div>
+</div>
+
+<hr class="my-5">
+
+<!-- KAFELKI AKCJI -->
+<div class="row text-center mb-5">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 shadow tile-card border-lososiowy">
+            <div class="card-body p-5">
+                <div class="display-1 mb-3">🛒</div>
+                <h2 class="card-title">Sklep Online</h2>
+                <p class="card-text">Kup gotowe jadłospisy, e-booki i poradniki, które pomogą Ci zacząć zmianę już dziś.
+                </p>
+                <a href="{{ url_for('shop') }}" class="btn btn-lososiowy btn-lg px-5 stretched-link">Przejdź do Sklepu</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 shadow tile-card border-malinowy">
+            <div class="card-body p-5">
+                <div class="display-1 mb-3">🗓️</div>
+                <h2 class="card-title">Umów Wizytę</h2>
+                <p class="card-text">Potrzebujesz indywidualnego wsparcia? Umów się na konsultację stacjonarnie lub
+                    online.</p>
+                <a href="{{ url_for('visit') }}" class="btn btn-malinowy btn-lg px-5 stretched-link">Zarezerwuj Termin</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

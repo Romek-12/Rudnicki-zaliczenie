@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="text-center text-malinowy fw-bold mb-5">Twój Koszyk</h1>
+
+{% if cart_items %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Produkt</th>
+                            <th>Cena</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart_items %}
+                        <tr>
+                            <td>{{ item.name }}</td>
+                            <td>{{ item.price }} zł</td>
+                            <td class="text-end">
+                                <a href="{{ url_for('remove_from_cart', index=loop.index0) }}" 
+                                   class="btn btn-outline-danger btn-sm">
+                                    🗑️ Usuń
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow border-malinowy">
+            <div class="card-body text-center">
+                <h3 class="text-buraczkowy">Suma: {{ total }} zł</h3>
+                <a href="{{ url_for('checkout') }}" class="btn btn-malinowy w-100 mt-3">Złóż zamówienie</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info text-center">
+    Twój koszyk jest pusty. <a href="{{ url_for('shop') }}">Przejdź do sklepu</a>
+</div>
+{% endif %}
+{% endblock %}
