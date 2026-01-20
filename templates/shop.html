@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1 class="text-center mb-5 text-buraczkowy fw-bold">Test</h1>
+<h2 class="text-center mb-5 text-buraczkowy fw-bold">Sklep</h2>
 
 <div class="row">
     {% for p in products %}
@@ -16,7 +16,8 @@
 
                 <div class="mt-auto">
                     <h4 class="mb-3 text-buraczkowy">{{ p.price }} zł</h4>
-                    <a href="{{ url_for('add_to_cart', product_id=p.id) }}" class="btn btn-lososiowy w-60">Dodaj do koszyka</a>
+                    <a href="{{ url_for('add_to_cart', product_id=p.id) }}" class="btn btn-lososiowy w-60">Dodaj do
+                        koszyka</a>
                 </div>
             </div>
         </div>

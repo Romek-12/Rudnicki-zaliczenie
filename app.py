@@ -239,7 +239,7 @@ def checkout():
         flash('Twój koszyk jest pusty!', 'warning')
         return redirect(url_for('shop'))
 
-    # Używamy Twojej klasy Koszyk do logiki biznesowej
+    # Używamy Twojej klasy Koszyk
     moj_koszyk = Koszyk()
     for item in cart_items:
         p = Product(item['id'], item['name'], item['price'], "")
