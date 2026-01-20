@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1 class="text-malinowy fw-bold mb-4">Przełóż wizytę</h1>
+
+<div class="alert alert-info">
+    <strong>Aktualna wizyta:</strong> {{ visit.date }} o {{ visit.time }}
+</div>
+
+<!-- Wybór daty i godziny -->
+{% if not request.args.get('confirm_date') %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-lososiowy mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Wybierz nową datę</h5>
+            </div>
+            <div class="card-body">
+                <form method="GET">
+                    <input type="date" name="date" class="form-control mb-3" 
+                           value="{{ selected_date }}" 
+                           min="{{ datetime.now().strftime('%Y-%m-%d') }}"
+                           required>
+                    <button type="submit" class="btn btn-lososiowy">Pokaż dostępne godziny</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card shadow border-malinowy">
+            <div class="card-header bg-white">
+                <h5 class="mb-0 text-malinowy">Dostępne terminy</h5>
+            </div>
+            <div class="card-body">
+                {% if available_slots %}
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for slot in available_slots %}
+                        <a href="?confirm_date={{ selected_date }}&confirm_time={{ slot }}" 
+                           class="btn btn-outline-malinowy">
+                            {{ slot }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">Brak wolnych terminów w tym dniu.</p>
+                {% endif %}
+                <a href="{{ url_for('account') }}" class="btn btn-secondary btn-sm mt-3">← Anuluj</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Potwierdzenie -->
+{% else %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-lg border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">Potwierdź przełożenie wizyty</h5>
+            </div>
+            <div class="card-body text-center">
+                <p class="mb-3">Czy na pewno chcesz przełożyć wizytę?</p>
+                <div class="alert alert-light">
+                    <strong>Stara wizyta:</strong> {{ visit.date }} o {{ visit.time }}<br>
+                    <strong class="text-success">Nowa wizyta:</strong> {{ request.args.get('confirm_date') }} o {{ request.args.get('confirm_time') }}
+                </div>
+                
+                <form method="POST" class="d-inline">
+                    <input type="hidden" name="date" value="{{ request.args.get('confirm_date') }}">
+                    <input type="hidden" name="time" value="{{ request.args.get('confirm_time') }}">
+                    <button type="submit" class="btn btn-success me-2">Potwierdź</button>
+                </form>
+                <a href="{{ url_for('reschedule_visit', visit_id=visit.id) }}" 
+                   class="btn btn-secondary">Wróć do wyboru</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

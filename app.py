@@ -145,17 +145,17 @@ def register():
         user_email = request.form.get('email')
         password = request.form.get('password')
         
-        # Sprawdzamy, czy taki użytkownik już istnieje
-        user_exists = User.query.filter_by(username=user_name).first()
+        # Sprawdzamy, czy email jest już w bazie
+        user_exists = User.query.filter_by(email=user_email).first()
         if user_exists:
-            flash('Ta nazwa jest już zajęta!', 'danger')
+            flash('Ten adres email jest już używany!', 'danger')
         else:
             # Szyfrujemy hasło zanim trafi do bazy!
             hashed_pw = generate_password_hash(password, method='pbkdf2:sha256')
             new_user = User(username=user_name, email=user_email, password=hashed_pw)
             db.session.add(new_user)
             db.session.commit()
-            flash('Konto utworzone! Możesz się teraz zalogować.', 'success')
+            flash(f'Witaj {user_name}! Możesz się teraz zalogować.', 'success')
             return redirect(url_for('login'))
             
     return render_template('register.html')
@@ -163,11 +163,11 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user_name = request.form.get('username')
+        user_email = request.form.get('email')
         password = request.form.get('password')
         
-        # Szukamy użytkownika w bazie
-        user = User.query.filter_by(username=user_name).first()
+        # Szukamy użytkownika po emailu
+        user = User.query.filter_by(email=user_email).first()
         
         # Sprawdzamy, czy istnieje i czy hasło się zgadza
         if user and check_password_hash(user.password, password):
@@ -178,6 +178,11 @@ def login():
             flash('Błędna nazwa użytkownika lub hasło.', 'danger')
     
     return render_template('login.html')
+
+@app.route('/forgot_password')
+def forgot_password():
+    flash('Link do zmiany hasła został wysłany na Twój adres email. Sprawdź swoją skrzynkę!', 'info')
+    return redirect(url_for('login'))
 
 @app.route('/logout')
 @login_required  # Tylko zalogowani mogą się wylogować
@@ -295,6 +300,64 @@ def book_visit():
         flash(f'Wizyta zarezerwowana na {date} o godzinie {time}! Link do płatności został wysłany na Twój adres email.', 'success')
     
     return redirect(url_for('account'))
+
+@app.route('/cancel_visit/<int:visit_id>')
+@login_required
+def cancel_visit(visit_id):
+    visit = Visit.query.get_or_404(visit_id)
+    
+    # Sprawdzamy, czy wizyta należy do zalogowanego użytkownika
+    if visit.user_id != current_user.id:
+        flash('Nie masz uprawnień do tej wizyty!', 'danger')
+        return redirect(url_for('account'))
+    
+    # Usuwamy wizytę z bazy
+    db.session.delete(visit)
+    db.session.commit()
+    flash('Wizyta została anulowana.', 'info')
+    return redirect(url_for('account'))
+
+@app.route('/reschedule_visit/<int:visit_id>', methods=['GET', 'POST'])
+@login_required
+def reschedule_visit(visit_id):
+    visit = Visit.query.get_or_404(visit_id)
+    
+    # Sprawdzamy uprawnienia
+    if visit.user_id != current_user.id:
+        flash('Nie masz uprawnień do tej wizyty!', 'danger')
+        return redirect(url_for('account'))
+    
+    if request.method == 'POST':
+        new_date = request.form.get('date')
+        new_time = request.form.get('time')
+        
+        # Walidacja: nie można wybrać daty z przeszłości
+        if datetime.strptime(new_date, '%Y-%m-%d').date() < datetime.now().date():
+            flash('Nie możesz wybrać daty z przeszłości!', 'danger')
+            return redirect(url_for('reschedule_visit', visit_id=visit.id))
+        
+        # Sprawdzamy czy nowy slot jest wolny
+        existing = Visit.query.filter_by(date=new_date, time=new_time).first()
+        if existing and existing.id != visit.id:  # Ignorujemy tę samą wizytę
+            flash('Ten termin jest już zajęty. Wybierz inny.', 'danger')
+            return redirect(url_for('reschedule_visit', visit_id=visit.id))
+        
+        # Przełóż wizytę
+        visit.date = new_date
+        visit.time = new_time
+        db.session.commit()
+        flash(f'✅ Wizyta została przełożona na {new_date} o {new_time}! Link do płatności wysłany na maila.', 'success')
+        return redirect(url_for('account'))
+    
+    # GET - pokazujemy formularz
+    selected_date = request.args.get('date', datetime.now().strftime('%Y-%m-%d'))
+    available_slots = get_available_slots(selected_date)
+    
+    return render_template('reschedule.html', 
+                         visit=visit,
+                         selected_date=selected_date, 
+                         available_slots=available_slots,
+                         datetime=datetime)  # Przekazujemy datetime do template
 
 # Tworzenie bazy przy starcie (MUSI być poza blokiem if __name__)
 with app.app_context():

@@ -41,27 +41,39 @@
 </div>
 
 <!-- SEKCJA: WIZYTY -->
-<div class="row">
-    <div class="col-md-6 mb-4">
-        <div class="card shadow-sm border-lososiowy">
-            <div class="card-header bg-white">
-                <h5 class="mb-0 text-lososiowy">📅 Zaplanowane Wizyty</h5>
-            </div>
-            <div class="card-body">
-                {% set upcoming = current_user.visits | selectattr('status', 'equalto', 'zaplanowana') | list %}
-                {% if upcoming %}
-                <ul class="list-group list-group-flush">
-                    {% for v in upcoming %}
-                    <li class="list-group-item">{{ v.date }} o {{ v.time }}</li>
-                    {% endfor %}
-                </ul>
-                {% else %}
+<div class="col-md-6 mb-4">
+    <div class="card shadow-sm border-lososiowy">
+        <div class="card-header bg-white">
+            <h5 class="mb-0 text-lososiowy">📅 Zaplanowane Wizyty</h5>
+        </div>
+        <div class="card-body">
+            {% set upcoming = current_user.visits | selectattr('status', 'equalto', 'zaplanowana') | list %}
+            {% if upcoming %}
+                {% for v in upcoming %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6 class="text-malinowy fw-bold">{{ v.date }} o {{ v.time }}</h6>
+                        <div class="btn-group w-100" role="group">
+                            <a href="{{ url_for('reschedule_visit', visit_id=v.id) }}" 
+                               class="btn btn-outline-warning btn-sm">
+                                Przełóż
+                            </a>
+                            <a href="{{ url_for('cancel_visit', visit_id=v.id) }}" 
+                               class="btn btn-outline-danger btn-sm"
+                               onclick="return confirm('Czy na pewno chcesz anulować tę wizytę?');">
+                                Anuluj
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
                 <p class="text-muted small mb-0">Brak zaplanowanych wizyt.</p>
-                {% endif %}
-                <a href="{{ url_for('visit') }}" class="btn btn-outline-lososiowy btn-sm mt-3">Umów nową wizytę</a>
-            </div>
+            {% endif %}
+            <a href="{{ url_for('visit') }}" class="btn btn-outline-lososiowy btn-sm mt-3">Umów nową wizytę</a>
         </div>
     </div>
+</div>
 
     <div class="col-md-6 mb-4">
         <div class="card shadow-sm border-secondary">
