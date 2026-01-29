@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 # Konfiguracaja
 
-app.config['SECRET_KEY'] = 'unikalny klucz do szyfrowania sesji' # klucz do szyfrowania ciasteczek
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-key-do-lokalnych-testow')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db' # ścieżka do pliku bazy danych
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -31,6 +31,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
 
+# VISIT to tabela wizyt w bazie danych
 class Visit(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -150,7 +151,7 @@ def register():
         if user_exists:
             flash('Ten adres email jest już używany!', 'danger')
         else:
-            # Szyfrujemy hasło zanim trafi do bazy!
+            # Szyfrujemy hasło zanim trafi do bazy
             hashed_pw = generate_password_hash(password, method='pbkdf2:sha256')
             new_user = User(username=user_name, email=user_email, password=hashed_pw)
             db.session.add(new_user)
@@ -357,7 +358,7 @@ def reschedule_visit(visit_id):
                          visit=visit,
                          selected_date=selected_date, 
                          available_slots=available_slots,
-                         datetime=datetime)  # Przekazujemy datetime do template
+                         datetime=datetime)
 
 # Tworzenie bazy przy starcie (MUSI być poza blokiem if __name__)
 with app.app_context():
